@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>📊 Upgrade Math AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Orbitron', sans-serif;
+    background:black;
+    color:white;
+    overflow:hidden;
+}
+
+/* FONDO */
+.symbol{
+    position:absolute;
+    bottom:-120px;
+    color:rgba(255,0,0,0.25);
+    font-size:22px;
+    animation:rise linear infinite;
+}
+
+@keyframes rise{
+    to{
+        transform:translateY(-130vh);
+        opacity:0;
+    }
+}
+
+/* LOGIN */
+.center{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    text-align:center;
+}
+
+h1{
+    color:#ff0033;
+    text-shadow:0 0 20px red;
+    font-size:48px;
+}
+
+.subtext{
+    color:#666;
+    font-size:13px;
+}
+
+/* INPUTS */
+input{
+    padding:16px;
+    margin:10px;
+    width:320px;
+    border-radius:12px;
+    border:1px solid red;
+    background:#0a0a0a;
+    color:white;
+}
+
+/* BOTONES */
+button{
+    padding:12px 20px;
+    margin:8px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:red;
+    color:white;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    width:85%;
+}
+
+.card{
+    background:#111;
+    border:1px solid red;
+    border-radius:15px;
+    padding:15px;
+}
+
+/* OPCIONES */
+.option{
+    display:block;
+    width:100%;
+    margin:6px 0;
+    padding:10px;
+    border:1px solid red;
+    background:black;
+    color:white;
+    cursor:pointer;
+}
+
+/* CHAT */
+#chat{
+    height:65vh;
+    overflow-y:auto;
+    padding:20px;
+}
+
+.user{
+    text-align:right;
+    color:#ff4d4d;
+    margin:10px;
+}
+
+.bot{
+    text-align:left;
+    margin:10px;
+}
+
+/* 🔧 FIX CHAT BAR CENTRADA ABAJO */
+.chat-input{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:black;
+}
+
+.chat-input input{
+    width:70%;
+    padding:15px;
+}
+
+.chat-input button{
+    width:120px;
+}
+
+/* 🔧 PLANNER MÁS PEQUEÑO */
+#planner{
+    position:fixed;
+    right:10px;
+    top:140px;
+    width:170px;
+    background:#111;
+    border:1px solid red;
+    border-radius:12px;
+    padding:8px;
+    font-size:11px;
+    z-index:10;
+}
+
+#planner input{
+    width:100%;
+    margin:4px 0;
+    padding:6px;
+    font-size:11px;
+    box-sizing:border-box;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+const symbols=["π","∑","√","∞","x","y","Δ","∫","+","-","=","%","α","β","θ","log","lim","≠","≈"];
+
+for(let i=0;i<45;i++){
+    let s=document.createElement("div");
+    s.className="symbol";
+    s.innerHTML=symbols[Math.floor(Math.random()*symbols.length)];
+    s.style.left=Math.random()*100+"%";
+    s.style.fontSize=(Math.random()*22+12)+"px";
+    s.style.animationDuration=(Math.random()*10+6)+"s";
+    document.body.appendChild(s);
+}
+</script>
+
+<!-- LOGIN -->
+<div id="login" class="center">
+    <h1>📊 Upgrade Math AI</h1>
+    <div class="subtext">Mathematics Learning System</div>
+
+    <input placeholder="Usuario">
+    <input type="password" placeholder="Contraseña">
+
+    <button onclick="login()">Iniciar sesión 🔑</button>
+    <button onclick="register()">Crear cuenta ✍️</button>
+
+    <p class="subtext">Made by Mario Ocaña</p>
+</div>
+
+<!-- 🔥 AÑADIDO SIN TOCAR NADA -->
+<div id="predictor" class="center" style="display:none;">
+    <h2>📊 Predicción de Nota</h2>
+
+    <input id="currentGrade" placeholder="Nota actual">
+    <input id="studyHours" placeholder="Horas/día">
+    <input id="studyType" placeholder="Tipo estudio">
+    <input id="extraHours" placeholder="Horas extra">
+    <input id="methods" placeholder="Métodos">
+
+    <button onclick="calculateGrade()">Calcular 🔥</button>
+    <h3 id="resultGrade"></h3>
+
+    <button onclick="goDashboard()">Continuar 🚀</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="center" style="display:none;">
+    <h2>🎯 Selección</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>🎓 Nivel</h3>
+            <button class="option" onclick="setLevel('ESO')">ESO</button>
+            <button class="option" onclick="setLevel('Bachillerato')">Bachillerato</button>
+            <button class="option" onclick="setLevel('PAU')">PAU</button>
+        </div>
+
+        <div class="card">
+            <h3>📚 Curso</h3>
+            <div id="courseBox"></div>
+        </div>
+
+        <div class="card">
+            <h3>🧠 Tema</h3>
+            <div id="topicBox"></div>
+        </div>
+
+    </div>
+
+    <button onclick="startChat()">Entrar 🚀</button>
+</div>
+
+<!-- CHAT -->
+<div id="chatUI" style="display:none;">
+    <h2 style="text-align:center;color:red;">🔥 Upgrade Math AI</h2>
+
+    <div id="chat"></div>
+
+    <div class="chat-input">
+        <input id="msg" placeholder="Escribe ejercicio...">
+        <button onclick="send()">Enviar</button>
+    </div>
+</div>
+
+<!-- PLANNER (SMALL FIX) -->
+<div id="planner">
+    <h4>📅 Planner</h4>
+
+    <input id="planTopic" placeholder="Tema">
+    <input id="planDiff" placeholder="Dificultad">
+
+    <button onclick="generatePlan()">OK</button>
+
+    <div id="planOut"></div>
+</div>
+
+<script>
+
+function login(){
+    document.getElementById("login").style.display="none";
+    document.getElementById("predictor").style.display="flex"; // 🔥 único cambio
+}
+
+function register(){
+    alert("Cuenta creada ✍️");
+}
+
+/* 🔥 AÑADIDO */
+function calculateGrade(){
+    let current = parseFloat(document.getElementById("currentGrade").value) || 5;
+    let hours = parseFloat(document.getElementById("studyHours").value) || 1;
+    let extra = parseFloat(document.getElementById("extraHours").value) || 0;
+    let type = document.getElementById("studyType").value.toLowerCase();
+    let methods = document.getElementById("methods").value.toLowerCase();
+
+    let improvement = (hours * 0.3) + (extra * 0.2);
+
+    if(type.includes("ejercicios")) improvement += 0.5;
+    if(methods.includes("practica")) improvement += 0.5;
+
+    let finalGrade = Math.min(10, current + improvement);
+
+    document.getElementById("resultGrade").innerHTML =
+        "📈 Nota estimada: " + finalGrade.toFixed(1);
+}
+
+function goDashboard(){
+    document.getElementById("predictor").style.display="none";
+    document.getElementById("dashboard").style.display="flex";
+}
+
+function setLevel(lvl){
+    let courses={
+        "ESO":["1 ESO","2 ESO","3 ESO","4 ESO"],
+        "Bachillerato":["1 Bach","2 Bach"],
+        "PAU":["Repaso"]
+    };
+
+    let box=document.getElementById("courseBox");
+    box.innerHTML="";
+
+    courses[lvl].forEach(c=>{
+        let b=document.createElement("button");
+        b.className="option";
+        b.innerText=c;
+        b.onclick=()=>setCourse(c);
+        box.appendChild(b);
+    });
+}
+
+function setCourse(c){
+
+    let topics=["Probabilidad","Álgebra","Geometría","Funciones"];
+
+    let box=document.getElementById("topicBox");
+    box.innerHTML="";
+
+    topics.forEach(t=>{
+        let b=document.createElement("button");
+        b.className="option";
+        b.innerText=t;
+        b.onclick=()=>setTopic(t);
+        box.appendChild(b);
+    });
+}
+
+function setTopic(t){
+    selectedTopic=t;
+}
+
+function startChat(){
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("chatUI").style.display="block";
+}
+
+/* 🔧 FIX PROBABILIDAD + CASO BOLSA */
+function send(){
+
+    let msg=document.getElementById("msg");
+    if(!msg.value.trim()) return;
+
+    let chat=document.getElementById("chat");
+    let text=msg.value.toLowerCase();
+
+    chat.innerHTML+=`<div class="user">🧑 Mario: ${msg.value}</div>`;
+
+    let response="";
+
+    if(text.includes("dado") && text.includes("6")){
+        response=`📘 Paso 1: Casos posibles = 6<br>
+📘 Paso 2: Casos favorables = 1<br>
+📘 Paso 3: Resultado = 1/6`;
+    }
+
+    else if(text.includes("bolsa") || (text.includes("3") && text.includes("2") && text.includes("roja"))){
+        response=`📘 Paso 1: Total = 3 + 2 = 5<br>
+📘 Paso 2: Favorables = 3 rojas<br>
+📘 Paso 3: Probabilidad = 3/5`;
+    }
+
+    else if(text.includes("probabilidad")){
+        response=`📘 Paso 1: Identificamos casos posibles<br>
+📘 Paso 2: Identificamos casos favorables<br>
+📘 Paso 3: P = favorables / posibles`;
+    }
+
+    else{
+        response=`📘 Paso 1: Analizamos el problema<br>
+📘 Paso 2: Aplicamos método<br>
+📘 Paso 3: Resultado paso a paso`;
+    }
+
+    chat.innerHTML+=`<div class="bot">👨‍🏫 Catedrático:<br>${response}</div>`;
+
+    msg.value="";
+}
+
+function generatePlan(){
+
+    let t=document.getElementById("planTopic").value;
+    let d=document.getElementById("planDiff").value;
+
+    document.getElementById("planOut").innerHTML=
+    `📘 ${t}<br>📊 ${d}/10<br>⏱ Día 1 teoría<br>⏱ Día 2 práctica<br>⏱ Día 3 examen`;
+}
+
+</script>
+
+</body>
+</html>
