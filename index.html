@@ -15,7 +15,6 @@ body{
     overflow:hidden;
 }
 
-/* FONDO */
 .symbol{
     position:absolute;
     bottom:-120px;
@@ -31,7 +30,6 @@ body{
     }
 }
 
-/* LOGIN */
 .center{
     display:flex;
     flex-direction:column;
@@ -52,7 +50,6 @@ h1{
     font-size:13px;
 }
 
-/* INPUTS */
 input{
     padding:16px;
     margin:10px;
@@ -63,7 +60,6 @@ input{
     color:white;
 }
 
-/* BOTONES */
 button{
     padding:12px 20px;
     margin:8px;
@@ -74,7 +70,6 @@ button{
     color:white;
 }
 
-/* GRID */
 .grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -89,7 +84,6 @@ button{
     padding:15px;
 }
 
-/* OPCIONES */
 .option{
     display:block;
     width:100%;
@@ -101,7 +95,6 @@ button{
     cursor:pointer;
 }
 
-/* CHAT */
 #chat{
     height:65vh;
     overflow-y:auto;
@@ -119,7 +112,6 @@ button{
     margin:10px;
 }
 
-/* 🔧 FIX CHAT BAR CENTRADA ABAJO */
 .chat-input{
     position:fixed;
     bottom:0;
@@ -140,7 +132,6 @@ button{
     width:120px;
 }
 
-/* 🔧 PLANNER MÁS PEQUEÑO */
 #planner{
     position:fixed;
     right:10px;
@@ -180,7 +171,6 @@ for(let i=0;i<45;i++){
 }
 </script>
 
-<!-- LOGIN -->
 <div id="login" class="center">
     <h1>📊 Upgrade Math AI</h1>
     <div class="subtext">Mathematics Learning System</div>
@@ -194,7 +184,6 @@ for(let i=0;i<45;i++){
     <p class="subtext">Made by Mario Ocaña</p>
 </div>
 
-<!-- 🔥 AÑADIDO SIN TOCAR NADA -->
 <div id="predictor" class="center" style="display:none;">
     <h2>📊 Predicción de Nota</h2>
 
@@ -210,7 +199,6 @@ for(let i=0;i<45;i++){
     <button onclick="goDashboard()">Continuar 🚀</button>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dashboard" class="center" style="display:none;">
     <h2>🎯 Selección</h2>
 
@@ -238,7 +226,6 @@ for(let i=0;i<45;i++){
     <button onclick="startChat()">Entrar 🚀</button>
 </div>
 
-<!-- CHAT -->
 <div id="chatUI" style="display:none;">
     <h2 style="text-align:center;color:red;">🔥 Upgrade Math AI</h2>
 
@@ -247,10 +234,13 @@ for(let i=0;i<45;i++){
     <div class="chat-input">
         <input id="msg" placeholder="Escribe ejercicio...">
         <button onclick="send()">Enviar</button>
+
+        <!-- 🔥 AÑADIDO -->
+        <input type="file" id="imageInput" accept="image/*">
+        <button onclick="sendImage()">📸</button>
     </div>
 </div>
 
-<!-- PLANNER (SMALL FIX) -->
 <div id="planner">
     <h4>📅 Planner</h4>
 
@@ -264,16 +254,53 @@ for(let i=0;i<45;i++){
 
 <script>
 
+let selectedCourse="";
+let selectedTopic="";
+
+// 🔥 AÑADIDO
+function expandResponse(base, text){
+
+    let extra = "";
+
+    extra += "<br><br>📖 EXPLICACIÓN DETALLADA:<br>";
+    extra += "Primero analizamos el problema y entendemos qué nos piden.<br>";
+    extra += "Después identificamos los datos disponibles.<br>";
+    extra += "Aplicamos la fórmula correcta paso a paso.<br>";
+
+    extra += "<br>🧠 DESARROLLO:<br>";
+    extra += "1) Identificar datos<br>";
+    extra += "2) Elegir método<br>";
+    extra += "3) Sustituir valores<br>";
+    extra += "4) Resolver operación<br>";
+
+    if(text.includes("dado")){
+        extra += "<br>🎲 EJEMPLO:<br>";
+        extra += "Un dado tiene 6 caras → casos posibles = 6<br>";
+        extra += "Solo un 6 → caso favorable = 1<br>";
+        extra += "👉 P = 1/6<br>";
+    }
+
+    if(text.includes("bolsa")){
+        extra += "<br>🎒 EJEMPLO:<br>";
+        extra += "3 rojas y 2 azules → total = 5<br>";
+        extra += "Probabilidad roja = 3/5<br>";
+    }
+
+    extra += "<br>💡 CONSEJO:<br>";
+    extra += "En exámenes escribe siempre los pasos, no solo el resultado.";
+
+    return base + extra;
+}
+
 function login(){
     document.getElementById("login").style.display="none";
-    document.getElementById("predictor").style.display="flex"; // 🔥 único cambio
+    document.getElementById("predictor").style.display="flex";
 }
 
 function register(){
     alert("Cuenta creada ✍️");
 }
 
-/* 🔥 AÑADIDO */
 function calculateGrade(){
     let current = parseFloat(document.getElementById("currentGrade").value) || 5;
     let hours = parseFloat(document.getElementById("studyHours").value) || 1;
@@ -316,9 +343,22 @@ function setLevel(lvl){
     });
 }
 
+let topicsByCourse = {
+    "1 ESO":["Números naturales","Divisibilidad","Fracciones","Decimales","Geometría básica"],
+    "2 ESO":["Fracciones","Ecuaciones","Sistemas","Proporcionalidad","Estadística"],
+    "3 ESO":["Ecuaciones","Funciones","Probabilidad","Geometría","Polinomios"],
+    "4 ESO":["Funciones","Trigonometría","Probabilidad","Estadística","Álgebra"],
+    "1 Bach":["Límites","Derivadas","Trigonometría","Matrices","Vectores"],
+    "2 Bach":["Integrales","Probabilidad avanzada","Distribuciones","Matrices","PAU"],
+    "Repaso":["Probabilidad","Álgebra","Geometría","Funciones"]
+};
+
 function setCourse(c){
 
+    selectedCourse = c;
+
     let topics=["Probabilidad","Álgebra","Geometría","Funciones"];
+    topics = topicsByCourse[c] || topics;
 
     let box=document.getElementById("topicBox");
     box.innerHTML="";
@@ -336,12 +376,34 @@ function setTopic(t){
     selectedTopic=t;
 }
 
+function generateSmartResponse(text){
+
+    if(selectedTopic.toLowerCase().includes("probabilidad")){
+        if(selectedCourse.includes("3 ESO")){
+            return "📘 Probabilidad 3 ESO<br>P = favorables / posibles";
+        }
+        if(selectedCourse.includes("4 ESO")){
+            return "📘 Probabilidad 4 ESO<br>Eventos y espacio muestral";
+        }
+        return "📘 Probabilidad general<br>P = casos favorables / totales";
+    }
+
+    if(selectedTopic.toLowerCase().includes("álgebra")){
+        return "📘 Álgebra<br>Resolver ecuaciones paso a paso";
+    }
+
+    if(selectedTopic.toLowerCase().includes("funciones")){
+        return "📘 Funciones<br>Dominio y gráfica";
+    }
+
+    return "📘 Método general<br>Analizar → Resolver";
+}
+
 function startChat(){
     document.getElementById("dashboard").style.display="none";
     document.getElementById("chatUI").style.display="block";
 }
 
-/* 🔧 FIX PROBABILIDAD + CASO BOLSA */
 function send(){
 
     let msg=document.getElementById("msg");
@@ -354,28 +416,13 @@ function send(){
 
     let response="";
 
-    if(text.includes("dado") && text.includes("6")){
-        response=`📘 Paso 1: Casos posibles = 6<br>
-📘 Paso 2: Casos favorables = 1<br>
-📘 Paso 3: Resultado = 1/6`;
+    if(selectedTopic){
+        response = generateSmartResponse(text);
     }
 
-    else if(text.includes("bolsa") || (text.includes("3") && text.includes("2") && text.includes("roja"))){
-        response=`📘 Paso 1: Total = 3 + 2 = 5<br>
-📘 Paso 2: Favorables = 3 rojas<br>
-📘 Paso 3: Probabilidad = 3/5`;
-    }
-
-    else if(text.includes("probabilidad")){
-        response=`📘 Paso 1: Identificamos casos posibles<br>
-📘 Paso 2: Identificamos casos favorables<br>
-📘 Paso 3: P = favorables / posibles`;
-    }
-
-    else{
-        response=`📘 Paso 1: Analizamos el problema<br>
-📘 Paso 2: Aplicamos método<br>
-📘 Paso 3: Resultado paso a paso`;
+    // 🔥 AÑADIDO
+    if(response){
+        response = expandResponse(response, text);
     }
 
     chat.innerHTML+=`<div class="bot">👨‍🏫 Catedrático:<br>${response}</div>`;
@@ -383,8 +430,40 @@ function send(){
     msg.value="";
 }
 
-function generatePlan(){
+// 🔥 AÑADIDO
+async function sendImage(){
 
+    let file = document.getElementById("imageInput").files[0];
+
+    if(!file){
+        alert("Sube una imagen primero");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("image", file);
+
+    let chat = document.getElementById("chat");
+
+    chat.innerHTML += `<div class="user">📸 Imagen enviada</div>`;
+
+    try{
+
+        let res = await fetch("/analyze-image", {
+            method: "POST",
+            body: formData
+        });
+
+        let data = await res.json();
+
+        chat.innerHTML += `<div class="bot">👨‍🏫 Catedrático:<br>${data.response}</div>`;
+
+    }catch(e){
+        chat.innerHTML += `<div class="bot">Error conectando con IA</div>`;
+    }
+}
+
+function generatePlan(){
     let t=document.getElementById("planTopic").value;
     let d=document.getElementById("planDiff").value;
 
@@ -393,6 +472,35 @@ function generatePlan(){
 }
 
 </script>
+<!-- 🔥 PREMIUM -->
+<div id="premiumBox" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+color:white;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:999;
+">
 
+<h1 style="color:red;">🔒 Modo Premium</h1>
+<p>Has alcanzado el límite gratuito</p>
+
+<button onclick="unlockPremium()" style="
+background:red;
+color:white;
+padding:15px;
+border:none;
+border-radius:10px;
+">
+Desbloquear 🔓
+</button>
+
+</div>
 </body>
 </html>
